@@ -19,6 +19,9 @@ jobs:
       - name: Run Docker Compose
         run: docker compose up -d
 
+      - name: Show current folder
+        run: ls -la
+
       - name: Open tests folder
         run: cd e2e-tests
 
