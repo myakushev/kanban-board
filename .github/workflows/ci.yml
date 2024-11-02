@@ -25,6 +25,9 @@ jobs:
       - name: Open tests folder
         run: cd e2e-tests
 
+      - name: Show current folder
+        run: ls -la
+
       - uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
