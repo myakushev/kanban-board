@@ -3,18 +3,23 @@ name: CI
 on:
   push:
     branches:
-      – main
+      - main
   pull_request:
     branches:
-      – main
+      - main
 
 jobs:
-  build:
+  docker:
+    timeout-minutes: 10
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v1
 
-      - name: Run Docker Compose
-        run: docker-compose up -d
+      - name: Start containers
+        run: docker-compose -f "docker-compose.yml" up -d --build
+
+      - name: Stop containers
+        if: always()
+        run: docker-compose -f "docker-compose.yml" down
