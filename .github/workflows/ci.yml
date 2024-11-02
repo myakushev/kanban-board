@@ -23,9 +23,7 @@ jobs:
         run: ls -la
 
       - name: Open tests folder
-        run: cd ./e2e-tests
-
-      - name: Show current folder
+        working-directory: /home/runner/work/kanban-board/kanban-board/e2e-tests
         run: ls -la
 
       - uses: actions/setup-java@v3
