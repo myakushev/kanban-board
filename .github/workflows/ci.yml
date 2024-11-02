@@ -32,10 +32,13 @@ jobs:
           java-version: '17'
 
       - name: Build & Install
+        working-directory: /home/runner/work/kanban-board/kanban-board/e2e-tests
         run: mvn -B install -D skipTests --no-transfer-progress
 
       - name: Ensure browsers are installed
+        working-directory: /home/runner/work/kanban-board/kanban-board/e2e-tests
         run: mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="install --with-deps"
 
       - name: Run tests
+        working-directory: /home/runner/work/kanban-board/kanban-board/e2e-tests
         run: mvn compile exec:java -D exec.mainClass="com.myakushev.App"
