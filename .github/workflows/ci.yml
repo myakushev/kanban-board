@@ -11,7 +11,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: mcr.microsoft.com/playwright/java:v1.46.0-noble
+    container:
+      image: mcr.microsoft.com/playwright/java:v1.48.0-jammy
+      options: --user 1001
 
     steps:
       - name: Checkout repository
