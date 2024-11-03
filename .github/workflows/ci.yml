@@ -26,6 +26,9 @@ jobs:
         working-directory: /home/runner/work/kanban-board/kanban-board/e2e-tests
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Show current folder
         run: ls -la
 
