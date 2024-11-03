@@ -11,6 +11,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    container: mcr.microsoft.com/playwright/java:v1.46.0-noble
 
     steps:
       - name: Checkout repository
@@ -19,29 +20,26 @@ jobs:
       - name: Run Docker Compose
         run: docker compose up -d
 
-  test:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: /home/runner/work/kanban-board/kanban-board/e2e-tests
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
       - name: Show current folder
         run: ls -la
 
-      - uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'
-          java-version: '17'
+      - name: Open tests folder
+        working-directory: /home/runner/work/kanban-board/kanban-board/e2e-tests
+        run: ls -la
+
+#      - uses: actions/setup-java@v3
+#        with:
+#          distribution: 'temurin'
+#          java-version: '17'
 
       - name: Build & Install
+        working-directory: /home/runner/work/kanban-board/kanban-board/e2e-tests
         run: mvn -B install -D skipTests --no-transfer-progress
 
       - name: Ensure browsers are installed
+        working-directory: /home/runner/work/kanban-board/kanban-board/e2e-tests
         run: mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="install --with-deps"
 
       - name: Run tests
+        working-directory: /home/runner/work/kanban-board/kanban-board/e2e-tests
         run: mvn compile exec:java -D exec.mainClass="com.myakushev.App"
