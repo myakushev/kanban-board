@@ -25,7 +25,7 @@ public class AppTest {
         try (Playwright playwright = Playwright.create()) {
             Browser browser = playwright.chromium()
                     .launch(new BrowserType.LaunchOptions()
-                            .setHeadless(false)
+                            .setHeadless(true)
                             .setSlowMo(50));
             Page page = browser.newPage();
 //            page.navigate("http://playwright.dev");
