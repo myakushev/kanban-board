@@ -1,15 +1,16 @@
 package com.myakushev;
 
 import com.microsoft.playwright.*;
+import com.myakushev.config.EnvConfig;
+import com.myakushev.config.EnvConfiguration;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
+@SpringBootApplication
 public class App {
     public static void main(String[] args) {
-        try (Playwright playwright = Playwright.create()) {
-            Browser browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(true).setSlowMo(50));
-            Page page = browser.newPage();
-//            page.navigate("http://playwright.dev");
-            page.navigate("http://localhost:4200/");
-            System.out.println(page.title());
-        }
+        ApplicationContext context = SpringApplication.run(App.class, args);
     }
 }

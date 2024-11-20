@@ -1,0 +1,14 @@
+gateways:
+  webGatewayUrl: http://localhost:4200/
+
+jdbc:
+  backend:
+    serverName: localhost
+    portNumber: 5432
+    databaseName: kanban
+    user: kanban
+    password: kanban
+#
+#webadmin:
+#  url: http://webadmin-ama.ama.tech/
+#  urlSelenium: http://webadmin-ama.ama.tech/
