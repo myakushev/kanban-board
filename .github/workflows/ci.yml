@@ -41,4 +41,4 @@ jobs:
 
       - name: Run tests
         working-directory: /home/runner/work/kanban-board/kanban-board/e2e-tests
-        run: mvn compile test exec:java -D exec.mainClass="com.myakushev.App"
+        run: mvn test
