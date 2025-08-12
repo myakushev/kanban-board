@@ -1,0 +1,10 @@
+gateways:
+  restGatewayUrl: http://localhost:8080/api
+
+jdbc:
+  kanban:
+    serverName: localhost
+    portNumber: 5432
+    databaseName: kanban
+    user: kanban
+    password: kanban
