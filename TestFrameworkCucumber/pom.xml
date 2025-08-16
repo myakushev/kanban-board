@@ -1,150 +1,134 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
+
+  <!-- Определяем родительский POM Spring Boot для управления версиями -->
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>3.2.5</version>
+    <relativePath/> <!-- lookup parent from repository -->
+  </parent>
 
   <groupId>com.myakushev</groupId>
   <artifactId>TestFrameworkCucumber</artifactId>
   <version>1.0-SNAPSHOT</version>
-  <packaging>jar</packaging>
 
-  <name>TestFrameworkCucumber</name>
-  <url>http://maven.apache.org</url>
-
+  <!--
+      В <properties> мы выносим все версии, чтобы управлять ими в одном месте.
+      Версия Java теперь задается одной переменной <java.version>.
+  -->
   <properties>
+    <java.version>17</java.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.source>17</maven.compiler.source>
-    <maven.compiler.target>17</maven.compiler.target>
-    <cucumber.version>7.0.0</cucumber.version>
-    <junit.version>4.13.2</junit.version>
-    <rest-assured.version>5.1.1</rest-assured.version>
-<!--    <testng.version>7.7.1</testng.version>-->
-    <slf4j.version>2.0.7</slf4j.version>
-    <jackson.version>2.15.2</jackson.version>
-    <hamcrest.version>1.3</hamcrest.version>
-    <lombok.version>1.18.30</lombok.version>
-    <allure.version>2.24.0</allure.version>
+
+    <!-- Версии зависимостей -->
+    <cucumber.version>7.15.0</cucumber.version> <!-- Согласованная версия для всех модулей Cucumber -->
+    <rest-assured.version>5.4.0</rest-assured.version>
+    <lombok.version>1.18.32</lombok.version>
+    <allure.version>2.27.0</allure.version>
     <swagger-coverage-rest-assured.version>1.5.0</swagger-coverage-rest-assured.version>
-    <assertj-core.version>3.22.0</assertj-core.version>
-    <postgresql.version>42.7.3</postgresql.version>
-    <HikariCP.version>5.1.0</HikariCP.version>
   </properties>
 
   <dependencies>
+    <!-- Spring Boot Starters -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-jdbc</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- Cucumber для JUnit 5 -->
     <dependency>
       <groupId>io.cucumber</groupId>
       <artifactId>cucumber-java</artifactId>
       <version>${cucumber.version}</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>io.cucumber</groupId>
-      <artifactId>cucumber-junit</artifactId>
+      <artifactId>cucumber-spring</artifactId>
       <version>${cucumber.version}</version>
       <scope>test</scope>
     </dependency>
+    <!-- Этот движок нужен для запуска Cucumber через JUnit 5 Platform -->
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>${junit.version}</version>
+      <groupId>io.cucumber</groupId>
+      <artifactId>cucumber-junit-platform-engine</artifactId>
+      <version>${cucumber.version}</version>
       <scope>test</scope>
     </dependency>
-<!--    <dependency>-->
-<!--      <groupId>org.testng</groupId>-->
-<!--      <artifactId>testng</artifactId>-->
-<!--      <version>${testng.version}</version>-->
-<!--      <scope>test</scope>-->
-<!--    </dependency>-->
+    <!-- Этот модуль нужен для создания сьютов в JUnit 5 -->
     <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>${slf4j.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-simple</artifactId>
-      <version>${slf4j.version}</version>
+      <groupId>org.junit.platform</groupId>
+      <artifactId>junit-platform-suite</artifactId>
       <scope>test</scope>
     </dependency>
+
+    <!-- УДАЛЕНА зависимость cucumber-junit, так как она для JUnit 4 -->
+
+    <!-- REST Assured -->
     <dependency>
       <groupId>io.rest-assured</groupId>
       <artifactId>rest-assured</artifactId>
       <version>${rest-assured.version}</version>
       <scope>test</scope>
     </dependency>
+
+    <!-- Драйвер базы данных -->
     <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-databind</artifactId>
-      <version>${jackson.version}</version>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <scope>runtime</scope>
     </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-annotations</artifactId>
-      <version>${jackson.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.hamcrest</groupId>
-      <artifactId>hamcrest-all</artifactId>
-      <version>${hamcrest.version}</version>
-      <scope>test</scope>
-    </dependency>
+
+    <!-- Утилиты -->
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
       <version>${lombok.version}</version>
+      <optional>true</optional>
     </dependency>
+
+    <!-- Библиотеки для отчетов -->
     <dependency>
       <groupId>io.qameta.allure</groupId>
       <artifactId>allure-rest-assured</artifactId>
       <version>${allure.version}</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.github.viclovsky</groupId>
       <artifactId>swagger-coverage-rest-assured</artifactId>
       <version>${swagger-coverage-rest-assured.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.assertj</groupId>
-      <artifactId>assertj-core</artifactId>
-      <version>${assertj-core.version}</version>
       <scope>test</scope>
     </dependency>
-    <!-- JDBC‑драйвер PostgreSQL -->
-    <dependency>
-      <groupId>org.postgresql</groupId>
-      <artifactId>postgresql</artifactId>
-      <version>${postgresql.version}</version>
-    </dependency>
-
-    <!-- Пул соединений HikariCP -->
-    <dependency>
-      <groupId>com.zaxxer</groupId>
-      <artifactId>HikariCP</artifactId>
-      <version>${HikariCP.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.logging.log4j</groupId>
-      <artifactId>log4j-api</artifactId>
-      <version>2.13.3</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.logging.log4j</groupId>
-      <artifactId>log4j-core</artifactId>
-      <version>2.13.3</version>
-    </dependency>
-
   </dependencies>
 
   <build>
     <plugins>
+      <!-- Плагины Surefire (для тестов) и Compiler управляются Spring Boot Parent.
+           Нет необходимости явно указывать их версии и базовую конфигурацию,
+           если мы используем стандартные properties. -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+<!--        <configuration>-->
+<!--          <includes>-->
+<!--            <include>**/TCuc.java</include>-->
+<!--          </includes>-->
+<!--        </configuration>-->
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.11.0</version>
-        <configuration>
-          <source>${maven.compiler.source}</source>
-          <target>${maven.compiler.target}</target>
-        </configuration>
       </plugin>
     </plugins>
   </build>
+
 </project>

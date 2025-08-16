@@ -1,37 +1,44 @@
 package com.myakushev.steps;
 
-import com.myakushev.config.EnvConfig;
-import com.myakushev.config.EnvConfigProvider;
-import com.myakushev.execution.Apis;
-import com.myakushev.testcontext.TestContext;
-import io.cucumber.java.en.And;
+import com.myakushev.db.DatabaseService;
+import com.myakushev.execution.WebApiClient;
+import com.myakushev.testcontext.ScenarioContext;
 import io.cucumber.java.en.Given;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import io.cucumber.java.en.Then;
+import io.cucumber.java.en.When;
+import static org.junit.jupiter.api.Assertions.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.List;
+import java.util.Map;
 
 public class StepsDefinitions {
-    private final Logger logger = LogManager.getLogger(getClass());
-    private final EnvConfig envConfig = EnvConfigProvider.getInstance(); // should be deleted from this class - should be in context or somewhere else
-//    private final TestContext testContext = TestContext.getTestContext();
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private Apis apis;
-
-    public StepsDefinitions() {
-        apis = Apis.getApis();
-    }
+    @Autowired
+    private ScenarioContext scenarioContext;
+    @Autowired
+    private WebApiClient webApiClient;
+    @Autowired
+    private DatabaseService databaseService;
 
     @Given("this is a basic test Scenario.")
-    public void basicTest() {
+    public void aBasicTestScenario() {
         logger.info("Cucumber setup is successful!");
-        String url = envConfig.getGateways().getRestGatewayUrl();
-        logger.info("First param: {}", url);
-        int db = envConfig.getJdbc().get("kanban").getPortNumber();
-        logger.info("Second param: {}", db);
     }
 
-    @And("send {word} request")
-    public void sendRequestWithBody(String requestName, String body) {
-        apis.get(requestName).executeRequest(body);
+    @When("I send a request to create a new kanban board")
+    public void sendCreateKanbanBoardRequest(String body) {
+        var response = webApiClient.kanbanApi().createKanbanBoard(body);
+        scenarioContext.setResponse(response);
+    }
+
+    @Then("the {word} table should contain {int} row")
+    public void theTableShouldContainRows(String tableName, int expectedRowCount) {
+        List<Map<String, Object>> actualRows = databaseService.selectAllFromTable(tableName);
+        logger.info("Found {} rows in table '{}'", actualRows.size(), tableName);
+        assertEquals(expectedRowCount, actualRows.size());
     }
 }

@@ -1,30 +1,26 @@
 package com.myakushev.steps;
 
-import com.myakushev.config.EnvConfigProvider;
-import io.cucumber.java.After;
+import com.myakushev.db.DatabaseService;
 import io.cucumber.java.Before;
-import io.cucumber.java.Scenario;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class CucumberHooks {
 
-    private static final String SPLITTER = "======================";
-    private final Logger logger = LogManager.getLogger(CucumberHooks.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static volatile boolean isDatabaseCleaned = false;
 
-    public CucumberHooks() {
-    }
+    @Autowired
+    private DatabaseService databaseService;
 
     @Before(order = 0)
-    public void setUp(Scenario scenario) {
-        EnvConfigProvider.init("env-config.yaml");
-        logger.info("{} SCENARIO '{}' {}", SPLITTER, scenario.getName(), SPLITTER);
+    public void setUp() {
+        synchronized (CucumberHooks.class) {
+            if (!isDatabaseCleaned) {
+                databaseService.cleanDatabase();
+                isDatabaseCleaned = true;
+            }
+        }
     }
-
-    @After(order = 1)
-    public void tearDown(Scenario scenario) {
-//        getTestContext().clear();
-        logger.info("{} END OF SCENARIO '{}' {}\n\n\n\n\n", SPLITTER, scenario.getName(), SPLITTER);
-    }
-
 }
