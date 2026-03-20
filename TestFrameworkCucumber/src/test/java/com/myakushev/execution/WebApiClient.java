@@ -4,18 +4,42 @@ import com.myakushev.config.AppConfig;
 import com.myakushev.execution.requests.webapi.KanbanBoardApi;
 import org.springframework.stereotype.Component;
 
-@Component // Сообщаем Spring, что это бин
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+@Component
 public class WebApiClient {
 
-    private final KanbanBoardApi kanbanBoardApi;
+    private final AppConfig appConfig;
+    private final Map<String, HttpBaseClient> clientCache = new ConcurrentHashMap<>();
 
-    // Spring автоматически внедрит нужный бин AppConfig
     public WebApiClient(AppConfig appConfig) {
-        HttpBaseClient httpClient = new HttpBaseClient(appConfig.getGateways().getRestGatewayUrl());
-        this.kanbanBoardApi = new KanbanBoardApi(httpClient);
+        this.appConfig = appConfig;
     }
 
+    // --- Фабричные методы, привязанные к конкретным сервисам ---
+
+    /**
+     * Возвращает API для работы с Kanban-сервисом.
+     * Этот метод "знает", что ему нужен "kanban-service".
+     */
     public KanbanBoardApi kanbanApi() {
-        return kanbanBoardApi;
+        // Жесткая привязка метода к имени сервиса. Просто и понятно.
+        return new KanbanBoardApi(getHttpClientFor("kanban-service"));
+    }
+
+    /**
+     * В будущем вы добавите сюда другие API.
+     * public UserApi userApi() {
+     *     return new UserApi(getHttpClientFor("user-service"));
+     * }
+     */
+
+    // Вспомогательный метод остается без изменений
+    private HttpBaseClient getHttpClientFor(String serviceName) {
+        return clientCache.computeIfAbsent(serviceName, name -> {
+            String gatewayUrl = appConfig.getServiceProperties(name).getGateway();
+            return new HttpBaseClient(gatewayUrl);
+        });
     }
 }

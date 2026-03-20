@@ -2,40 +2,32 @@ package com.myakushev.db;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
-@Service // @Service - это специализация @Component для бизнес-логики
+// УБРАЛИ @Service! Теперь это обычный, легковесный класс.
 public class DatabaseService {
 
     private static final Logger logger = LoggerFactory.getLogger(DatabaseService.class);
     private final JdbcTemplate jdbcTemplate;
     private final String schemaName;
 
-    @Autowired
-    public DatabaseService(JdbcTemplate jdbcTemplate, @Value("${spring.datasource.hikari.schema}") String schemaName) {
+    // Конструктор остается таким же, его будет вызывать наша Фабрика
+    public DatabaseService(JdbcTemplate jdbcTemplate, String schemaName) {
         this.jdbcTemplate = jdbcTemplate;
         this.schemaName = schemaName;
     }
 
-    /**
-     * Выполняет запрос 'SELECT * FROM tableName' и возвращает результат.
-     */
     public List<Map<String, Object>> selectAllFromTable(String tableName) {
         if (!tableName.matches("^[a-zA-Z0-9_]+$")) {
             throw new IllegalArgumentException("Invalid table name format.");
         }
-        return jdbcTemplate.queryForList("SELECT * FROM " + tableName);
+        String qualifiedTableName = "\"" + schemaName + "\".\"" + tableName + "\"";
+        return jdbcTemplate.queryForList("SELECT * FROM " + qualifiedTableName);
     }
 
-    /**
-     * Полностью очищает все таблицы в схеме.
-     */
     public void cleanDatabase() {
         logger.info("Starting database cleanup for schema '{}'...", schemaName);
 
@@ -49,7 +41,11 @@ public class DatabaseService {
             return;
         }
 
-        String sql = "TRUNCATE TABLE " + String.join(", ", tableNames) + " RESTART IDENTITY CASCADE";
+        String tablesToTruncate = tableNames.stream()
+                .map(name -> "\"" + schemaName + "\".\"" + name + "\"")
+                .collect(Collectors.joining(", "));
+
+        String sql = "TRUNCATE TABLE " + tablesToTruncate + " RESTART IDENTITY CASCADE";
         logger.info("Executing cleanup command: {}", sql);
         jdbcTemplate.execute(sql);
         logger.info("Database schema '{}' cleaned successfully.", schemaName);

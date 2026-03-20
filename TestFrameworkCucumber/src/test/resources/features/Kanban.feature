@@ -1,23 +1,31 @@
 Feature: Kanban Board Management
 
-  Scenario: 1 - Create a new kanban board and verify it in the database
-    Given this is a basic test Scenario.
-    When I send a request to create a new kanban board
-      """
-      {
-        "title": "Board created from test 1 Spring"
-      }
-      """
-    # Предполагая, что ваше API создает запись в таблице 'kanban_boards'
-    Then the kanban table should contain 1 row
+  Background:
+    Given the database for service kwanban-service is clean
 
-  Scenario: 2 - Create a new kanban board and verify it in the database
-    Given this is a basic test Scenario.
-    When I send a request to create a new kanban board
+  Scenario: Create one board and verify it exists
+    When I create a new kanban board with body:
       """
       {
-        "title": "Board created from test 2 Spring"
+        "title": "Board from an elegant test"
       }
       """
-    # Предполагая, что ваше API создает запись в таблице 'kanban_boards'
-    Then the kanban table should contain 2 row
+    Then the "kanban" table for kanban boards should contain 1 rows
+
+  Scenario: Create a second board and verify total count
+    # Сначала создаем первую доску, т.к. Background очистил базу
+    When I create a new kanban board with body:
+      """
+      {
+        "title": "First of two boards"
+      }
+      """
+    # Затем вторую
+    When I create a new kanban board with body:
+      """
+      {
+        "title": "Second of two boards"
+      }
+      """
+    # И проверяем итоговое количество
+    Then the "kanban" table for kanban boards should contain 2 rows

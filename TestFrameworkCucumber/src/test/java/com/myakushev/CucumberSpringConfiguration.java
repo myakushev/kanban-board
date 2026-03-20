@@ -3,20 +3,25 @@ package com.myakushev;
 import com.myakushev.config.AppConfig;
 import io.cucumber.spring.CucumberContextConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
+import org.springframework.boot.autoconfigure.jdbc.JdbcTemplateAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 
-/**
- * Этот класс связывает Cucumber с контекстом Spring.
- * Аннотация @CucumberContextConfiguration сообщает Cucumber, что это конфигурационный класс.
- * Аннотация @SpringBootTest запускает полный контекст Spring Boot для наших тестов.
- */
 @CucumberContextConfiguration
 @SpringBootTest(classes = CucumberSpringConfiguration.class)
 @EnableConfigurationProperties(AppConfig.class)
 @ComponentScan(basePackages = "com.myakushev")
-@EnableAutoConfiguration
+// *** ЭТО КЛЮЧЕВОЕ ИЗМЕНЕНИЕ ***
+// Мы говорим Spring: не пытайся автоматически создавать DataSource, TransactionManager и JdbcTemplate.
+// Мы создадим их сами, когда нам это понадобится.
+@EnableAutoConfiguration(exclude = {
+        DataSourceAutoConfiguration.class,
+//        DataSourceTransactionManagerAutoConfiguration.class,
+//        JdbcTemplateAutoConfiguration.class
+})
 public class CucumberSpringConfiguration {
     // Этот класс может быть пустым. Его задача - содержать аннотации.
 }

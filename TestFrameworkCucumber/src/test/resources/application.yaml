@@ -1,26 +1,27 @@
-# Spring Boot будет автоматически использовать этот файл
 app:
-  gateways:
-    rest-gateway-url: http://localhost:8080/api
+  services:
+    kanban-service:
+      gateway: http://localhost:8080/api
+      db:
+        url: jdbc:postgresql://localhost:5432/kanban
+        username: kanban
+        password: kanban
+        driver-class-name: org.postgresql.Driver
+        schema: public
 
-spring:
-  datasource:
-    # URL для подключения к базе. Spring Boot сам соберет его, если указать поля ниже,
-    # но явное указание более наглядно.
-    url: jdbc:postgresql://localhost:5432/kanban
-    username: kanban
-    password: kanban
-    # Имя класса драйвера. Spring Boot обычно сам его определяет, но лучше указать для ясности.
-    driver-class-name: org.postgresql.Driver
-    # Свойства для пула соединений HikariCP (используется по умолчанию)
-    hikari:
-      schema: public # Схема, в которой производится очистка
-      connection-timeout: 30000
-      maximum-pool-size: 5
+    user-service:
+      gateway: http://localhost:8081/api
+      db:
+        url: jdbc:postgresql://localhost:5432/users
+        username: user_service_user
+        password: user_service_pass
+        driver-class-name: org.postgresql.Driver
+        schema: public
+
+    notification-service:
+      gateway: http://localhost:8082/api
 
 logging:
   level:
-    # Уровень логгирования для нашего фреймворка
     com.myakushev: DEBUG
-    # Уровень логгирования для Spring
     org.springframework: INFO
