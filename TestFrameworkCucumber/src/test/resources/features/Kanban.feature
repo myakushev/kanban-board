@@ -1,7 +1,7 @@
 Feature: Kanban Board Management
 
   Background:
-    Given the database for service kwanban-service is clean
+    Given the database for service kanban-service is clean
 
   Scenario: Create one board and verify it exists
     When I create a new kanban board with body:
