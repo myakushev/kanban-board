@@ -1,4 +1,4 @@
-version: '3'
+version: '3.8'
 services:
 
   kanban-postgres:
@@ -23,17 +23,12 @@ services:
       - POSTGRES_PASSWORD=kanban
     ports:
       - 8080:8080
-    links:
-      - kanban-postgres
 
   kanban-ui:
     build: ./kanban-ui
     container_name: kanban-ui
     ports:
       - 4200:80
-    links:
-      - kanban-app
-
 
 volumes:
   kanban-data:

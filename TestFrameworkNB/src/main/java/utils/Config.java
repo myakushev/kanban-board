@@ -1,22 +1,27 @@
-package com.myakushev.utils;
+package utils;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-public final class Config {
-    private static final String CONFIG_PROPERTIES = "config.properties";
+public class Config {
+    private static final String PROPERTIES_FILE = "config.properties";
+    private static Properties properties;
     private static Config config;
-    private Properties properties;
 
     private Config() {
         properties = new Properties();
-        loadProperties(CONFIG_PROPERTIES);
+        loadProperties(PROPERTIES_FILE);
     }
 
-    private static Config getConfig() {
+    public static String getProperty(String key) {
+        getConfig();
+        return properties.getProperty(key);
+    }
+
+    public static Config getConfig() {
         if (config == null) {
-            config =  new Config();
+            config = new Config();
         }
         return config;
     }
@@ -33,7 +38,4 @@ public final class Config {
         }
     }
 
-    public static String getProperty(String key) {
-        return Config.getConfig().properties.getProperty(key);
-    }
 }
