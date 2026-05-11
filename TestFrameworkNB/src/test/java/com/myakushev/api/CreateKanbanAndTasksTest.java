@@ -8,7 +8,7 @@ import org.testng.annotations.Test;
 
 import static org.assertj.core.api.Assertions.*;
 
-public class CreateKanbanAndTasks extends BaseApiTest {
+public class CreateKanbanAndTasksTest extends BaseApiTest {
 
     @Test
     public void createSimpleKanban() {
