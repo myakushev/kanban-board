@@ -40,3 +40,24 @@ jobs:
       - name: Run RestAssured tests using TestNG
         working-directory: ./TestFrameworkNB
         run: mvn test
+
+      - name: Generate Allure Report
+        working-directory: ./TestFrameworkNB
+        run: mvn allure:report
+        continue-on-error: true
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        if: github.ref == 'refs/heads/main'
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./TestFrameworkNB/target/site/allure-maven-plugin/
+          destination_dir: allure-report
+
+      - name: Upload Allure Report as Artifact
+        uses: actions/upload-artifact@v4
+        if: always() # Загружаем даже при падении тестов
+        with:
+          name: allure-report
+          path: ./TestFrameworkNB/target/site/allure-maven-plugin/
+          retention-days: 7

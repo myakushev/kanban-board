@@ -1,6 +1,7 @@
 package com.myakushev.api.spec;
 
 import com.myakushev.api.utils.DataSources;
+import io.qameta.allure.restassured.AllureRestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
@@ -24,7 +25,8 @@ public class Specifications {
         return new RequestSpecBuilder()
                 .setBaseUri(Config.getProperty("app.apiUrl"))
                 .setContentType(ContentType.JSON)
-                .setAccept(ContentType.JSON);
+                .setAccept(ContentType.JSON)
+                .addFilter(new AllureRestAssured());
     }
 
     public RequestSpecification noAuthSpec() {

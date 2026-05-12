@@ -5,6 +5,7 @@ import com.myakushev.api.models.tasks.TaskRequest;
 import com.myakushev.api.requests.BaseRequest;
 import com.myakushev.api.requests.CrudInterface;
 import com.myakushev.api.requests.unchecked.UncheckedKanban;
+import io.qameta.allure.Step;
 import io.restassured.specification.RequestSpecification;
 import org.apache.http.HttpStatus;
 
@@ -15,6 +16,7 @@ public class CheckedKanban extends BaseRequest implements CrudInterface {
     }
 
     @Override
+    @Step("Checked create Kanban request {obj}")
     public Kanban create(Object obj) {
         return new UncheckedKanban(spec)
                 .create(obj)
