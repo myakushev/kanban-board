@@ -50,13 +50,13 @@ jobs:
         uses: peaceiris/actions-gh-pages@v3
         if: github.ref == 'refs/heads/main'
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.kanban-token }}
           publish_dir: ./TestFrameworkNB/target/site/allure-maven-plugin/
           destination_dir: allure-report
 
       - name: Upload Allure Report as Artifact
         uses: actions/upload-artifact@v4
-        if: always() # Загружаем даже при падении тестов
+        if: always()
         with:
           name: allure-report
           path: ./TestFrameworkNB/target/site/allure-maven-plugin/
