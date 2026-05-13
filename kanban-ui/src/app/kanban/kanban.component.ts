@@ -14,11 +14,12 @@ import { TaskService } from '../service/task.service';
   styleUrls: ['./kanban.component.css']
 })
 export class KanbanComponent implements OnInit {
-  
+
   kanban: Kanban;
   todos: Task[] = [];
   inprogress: Task[] = [];
   dones: Task[] = [];
+  isLoadingSystemTasks = false;
 
   constructor(
     private kanbanService: KanbanService,
@@ -48,7 +49,8 @@ export class KanbanComponent implements OnInit {
   }
 
   openTaskDialog(event): void {
-    let taskId = event.srcElement.id;
+    let taskId = event.srcElement.id || event.target.id;
+    if (!taskId) return;
 
     this.taskService.getTaskById(taskId).subscribe(
       response => {
@@ -65,15 +67,15 @@ export class KanbanComponent implements OnInit {
         this.kanban = response;
         this.splitTasksByStatus(response);
       }
-    )
+    );
   }
 
   private splitTasksByStatus(kanban: Kanban): void {
-    this.todos = kanban.tasks.filter(t=>t.status==='TODO');
-    this.inprogress = kanban.tasks.filter(t=>t.status==='INPROGRESS');
-    this.dones = kanban.tasks.filter(t=>t.status==='DONE');
+    this.todos = kanban.tasks.filter(t => t.status === 'TODO');
+    this.inprogress = kanban.tasks.filter(t => t.status === 'INPROGRESS');
+    this.dones = kanban.tasks.filter(t => t.status === 'DONE');
   }
-  
+
   private updateTaskStatusAfterDragDrop(event: CdkDragDrop<string[], string[]>) {
     let taskId = event.item.element.nativeElement.id;
     let containerId = event.container.id;
@@ -86,14 +88,16 @@ export class KanbanComponent implements OnInit {
   }
 
   private updateTaskStatus(task: Task, containerId: string): void {
-    if (containerId === 'todo'){
-      task.status = 'TODO'
-    } else if (containerId === 'inpro'){
-      task.status = 'INPROGRESS'
+    if (containerId === 'todo') {
+      task.status = 'TODO';
+    } else if (containerId === 'inpro') {
+      task.status = 'INPROGRESS';
     } else {
-      task.status = 'DONE'
+      task.status = 'DONE';
     }
-    this.taskService.updateTask(task).subscribe();
+    this.taskService.updateTask(task).subscribe(() => {
+      this.getKanban();
+    });
   }
 
   private openDialog(title: string, task: Task): void {
@@ -104,6 +108,43 @@ export class KanbanComponent implements OnInit {
       task: task,
       kanbanId: this.kanban.id
     };
-    this.dialog.open(TaskDialogComponent, dialogConfig)
+    const dialogRef = this.dialog.open(TaskDialogComponent, dialogConfig);
+
+    dialogRef.afterClosed().subscribe(() => {
+      this.getKanban();
+    });
+  }
+
+  loadSystemTasks(): void {
+    this.isLoadingSystemTasks = true;
+    this.taskService.loadSystemTasks(3).subscribe({
+      next: (message) => {
+        this.isLoadingSystemTasks = false;
+        alert(message);
+        this.getKanban();
+      },
+      error: (error) => {
+        this.isLoadingSystemTasks = false;
+        console.error('Error loading system tasks:', error);
+        alert('Failed to load system tasks');
+      }
+    });
+  }
+
+  promoteToSystemTask(taskId: number, event: Event): void {
+    event.stopPropagation();
+
+    if (confirm('Are you sure you want to mark this task as a system task? It will be sent to the external system.')) {
+      this.taskService.promoteToSystemTask(taskId).subscribe({
+        next: (updatedTask) => {
+          alert('Task "' + updatedTask.title + '" is now a system task!');
+          this.getKanban();
+        },
+        error: (error) => {
+          console.error('Error promoting task:', error);
+          alert('Failed to promote task to external system');
+        }
+      });
+    }
   }
 }

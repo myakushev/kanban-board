@@ -2,7 +2,7 @@ package com.wkrzywiec.medium.kanban.model;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -19,21 +19,22 @@ import java.util.Objects;
         generator = ObjectIdGenerators.PropertyGenerator.class,
         property = "id",
         scope = Kanban.class)
+@Schema(description = "Kanban board entity")
 public class Kanban {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @ApiModelProperty(position = 1)
+    @Schema(description = "Unique identifier of the kanban board", example = "1", accessMode = Schema.AccessMode.READ_ONLY)
     private Long id;
 
-    @ApiModelProperty(position = 2)
+    @Schema(description = "Title of the kanban board", example = "My Project Board", required = true)
     private String title;
 
     @OneToMany(
             cascade = {CascadeType.ALL},
             fetch = FetchType.EAGER)
     @JoinColumn(name = "kanban_id")
-    @ApiModelProperty(position = 3)
+    @Schema(description = "List of tasks in this kanban board")
     private List<Task> tasks;
 
     public void addTask(Task task) {

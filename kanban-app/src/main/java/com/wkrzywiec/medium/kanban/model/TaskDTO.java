@@ -1,6 +1,6 @@
 package com.wkrzywiec.medium.kanban.model;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,17 +10,24 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(description = "Data Transfer Object for Task")
 public class TaskDTO {
 
-    @ApiModelProperty(position = 1)
+    @Schema(description = "Title of the task", example = "Implement login feature", required = true)
     private String title;
 
-    @ApiModelProperty(position = 2)
+    @Schema(description = "Detailed description of the task", example = "Add OAuth2 authentication")
     private String description;
 
-    @ApiModelProperty(position = 3)
+    @Schema(description = "Color code for the task card", example = "#FF5733")
     private String color;
 
-    @ApiModelProperty(position = 4)
+    @Schema(description = "Current status of the task", example = "TODO")
     private TaskStatus status;
+
+    @Schema(description = "Flag indicating if this is a system task", example = "false")
+    private boolean systemTask;
+
+    @Schema(description = "External system identifier if task is promoted to system task", example = "ext_12345")
+    private String externalId;
 }

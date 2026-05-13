@@ -16,6 +16,7 @@ export class TaskDialogComponent implements OnInit {
   dialogTitle: String;
   kanbanId: String;
   task: Task;
+  isPromoting = false;
 
   form: FormGroup;
 
@@ -30,6 +31,9 @@ export class TaskDialogComponent implements OnInit {
     this.kanbanId = data.kanbanId;
     this.task = data.task;
 
+    // Инициализируем поля, если их нет
+    if (!this.task.systemTask) this.task.systemTask = false;
+
     this.form = fb.group({
       title: [this.task.title, Validators.required],
       description: [this.task.description, Validators.required],
@@ -43,17 +47,21 @@ export class TaskDialogComponent implements OnInit {
   save() {
     this.mapFormToTaskModel();
     if (!this.task.id) {
-      this.kanbanService.saveNewTaskInKanban(this.kanbanId, this.task).subscribe();
+      this.kanbanService.saveNewTaskInKanban(this.kanbanId, this.task).subscribe(() => {
+        this.dialogRef.close();
+        window.location.reload();
+      });
     } else {
-      this.taskService.updateTask(this.task).subscribe();
+      this.taskService.updateTask(this.task).subscribe(() => {
+        this.dialogRef.close();
+        window.location.reload();
+      });
     }
-    this.dialogRef.close();
-    window.location.reload();
   }
 
   close() {
       this.dialogRef.close();
-  } 
+  }
 
   private mapFormToTaskModel(): void {
     this.task.title = this.form.get('title').value;
@@ -62,4 +70,21 @@ export class TaskDialogComponent implements OnInit {
     this.task.status = 'TODO';
   }
 
+  // НОВЫЙ МЕТОД: Отправить задачу во внешнюю систему
+  promoteToSystem(): void {
+    this.isPromoting = true;
+    this.taskService.promoteToSystemTask(this.task.id).subscribe({
+      next: (updatedTask) => {
+        this.task = updatedTask;
+        this.isPromoting = false;
+        alert(`Task "${this.task.title}" has been promoted to system task!`);
+        // Не закрываем диалог, чтобы пользователь видел обновление
+      },
+      error: (error) => {
+        this.isPromoting = false;
+        console.error('Error promoting task:', error);
+        alert('Failed to promote task to external system');
+      }
+    });
+  }
 }

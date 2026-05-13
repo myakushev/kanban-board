@@ -5,7 +5,12 @@ import com.wkrzywiec.medium.kanban.model.KanbanDTO;
 import com.wkrzywiec.medium.kanban.model.Task;
 import com.wkrzywiec.medium.kanban.model.TaskDTO;
 import com.wkrzywiec.medium.kanban.service.KanbanService;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,12 +22,18 @@ import java.util.Optional;
 @RequestMapping("/kanbans")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "http://localhost:4200")
+@Tag(name = "Kanban Board Management", description = "Endpoints for managing kanban boards")
 public class KanbanController {
 
     private final KanbanService kanbanService;
 
     @GetMapping("/")
-    @ApiOperation(value="View a list of all Kanban boards", response = Kanban.class, responseContainer = "List")
+    @Operation(summary = "Get all kanban boards", description = "Returns a list of all kanban boards")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved kanban boards",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = Kanban.class))),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     public ResponseEntity<?> getAllKanbans(){
         try {
             return new ResponseEntity<>(
@@ -34,7 +45,13 @@ public class KanbanController {
     }
 
     @GetMapping("/{id}")
-    @ApiOperation(value="Find a Kanban board info by its id", response = Kanban.class)
+    @Operation(summary = "Get kanban board by ID", description = "Returns a single kanban board by its unique identifier")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully found kanban board",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = Kanban.class))),
+            @ApiResponse(responseCode = "404", description = "Kanban board not found"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     public ResponseEntity<?> getKanban(@PathVariable Long id){
         try {
             Optional<Kanban> optKanban = kanbanService.getKanbanById(id);
@@ -51,7 +68,13 @@ public class KanbanController {
     }
 
     @GetMapping("")
-    @ApiOperation(value="Find a Kanban board info by its title", response = Kanban.class)
+    @Operation(summary = "Get kanban board by title", description = "Returns a kanban board by its title")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully found kanban board",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = Kanban.class))),
+            @ApiResponse(responseCode = "404", description = "Kanban board not found"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     public ResponseEntity<?> getKanbanByTitle(@RequestParam String title){
         try {
             Optional<Kanban> optKanban = kanbanService.getKanbanByTitle(title);
@@ -68,7 +91,12 @@ public class KanbanController {
     }
 
     @PostMapping("/")
-    @ApiOperation(value="Save new Kanban board", response = Kanban.class)
+    @Operation(summary = "Create new kanban board", description = "Creates and saves a new kanban board")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Kanban board successfully created",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = Kanban.class))),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     public ResponseEntity<?> createKanban(@RequestBody KanbanDTO kanbanDTO){
         try {
             return new ResponseEntity<>(
@@ -80,7 +108,13 @@ public class KanbanController {
     }
 
     @PutMapping("/{id}")
-    @ApiOperation(value="Update a Kanban board with specific id", response = Kanban.class)
+    @Operation(summary = "Update kanban board", description = "Updates an existing kanban board by its ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Kanban board successfully updated",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = Kanban.class))),
+            @ApiResponse(responseCode = "404", description = "Kanban board not found"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     public ResponseEntity<?> updateKanban(@PathVariable Long id, @RequestBody KanbanDTO kanbanDTO){
         try {
             Optional<Kanban> optKanban = kanbanService.getKanbanById(id);
@@ -97,7 +131,13 @@ public class KanbanController {
     }
 
     @DeleteMapping("/{id}")
-    @ApiOperation(value="Delete Kanban board with specific id", response = String.class)
+    @Operation(summary = "Delete kanban board", description = "Deletes a kanban board by its ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Kanban board successfully deleted",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = String.class))),
+            @ApiResponse(responseCode = "404", description = "Kanban board not found"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     public ResponseEntity<?> deleteKanban(@PathVariable Long id){
         try {
             Optional<Kanban> optKanban = kanbanService.getKanbanById(id);
@@ -115,9 +155,15 @@ public class KanbanController {
     }
 
     @GetMapping("/{kanbanId}/tasks/")
-    @ApiOperation(value="View a list of all tasks for a Kanban with provided id", response = Task.class, responseContainer = "List")
+    @Operation(summary = "Get all tasks in kanban board", description = "Returns a list of all tasks for a specific kanban board")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved tasks",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = Task.class))),
+            @ApiResponse(responseCode = "404", description = "Kanban board not found"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     public ResponseEntity<?> getAllTasksInKanban(@PathVariable Long kanbanId){
-         try {
+        try {
             Optional<Kanban> optKanban = kanbanService.getKanbanById(kanbanId);
             if (optKanban.isPresent()) {
                 return new ResponseEntity<>(
@@ -132,7 +178,12 @@ public class KanbanController {
     }
 
     @PostMapping("/{kanbanId}/tasks/")
-    @ApiOperation(value="Save new Task and assign it to Kanban board", response = Kanban.class)
+    @Operation(summary = "Create task and assign to kanban board", description = "Creates a new task and assigns it to the specified kanban board")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Task successfully created and assigned",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = Kanban.class))),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     public ResponseEntity<?> createTaskAssignedToKanban(@PathVariable Long kanbanId, @RequestBody TaskDTO taskDTO){
         try {
             return new ResponseEntity<>(

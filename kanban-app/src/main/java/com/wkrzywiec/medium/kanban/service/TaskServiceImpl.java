@@ -2,6 +2,7 @@ package com.wkrzywiec.medium.kanban.service;
 
 import com.wkrzywiec.medium.kanban.model.Task;
 import com.wkrzywiec.medium.kanban.model.TaskDTO;
+import com.wkrzywiec.medium.kanban.model.TaskStatus;
 import com.wkrzywiec.medium.kanban.repository.TaskRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -37,7 +38,6 @@ public class TaskServiceImpl implements TaskService {
         return taskRepository.findByTitle(title);
     }
 
-
     @Override
     @Transactional
     public Task saveNewTask(TaskDTO taskDTO) {
@@ -56,12 +56,37 @@ public class TaskServiceImpl implements TaskService {
         taskRepository.delete(task);
     }
 
+    @Override
+    @Transactional
+    public Task promoteToSystemTask(Long id, String externalId) {
+        Task task = taskRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Task not found with id: " + id));
+        task.setSystemTask(true);
+        task.setExternalId(externalId);
+        return taskRepository.save(task);
+    }
+
+    @Override
+    @Transactional
+    public Task saveSystemTask(String title, String description, String externalId) {
+        Task task = new Task();
+        task.setTitle(title);
+        task.setDescription(description);
+        task.setColor("#FFFFFF");
+        task.setStatus(TaskStatus.TODO);
+        task.setSystemTask(true);
+        task.setExternalId(externalId);
+        return taskRepository.save(task);
+    }
+
     private Task convertDTOToTask(TaskDTO taskDTO) {
         Task task = new Task();
         task.setTitle(taskDTO.getTitle());
         task.setDescription(taskDTO.getDescription());
         task.setColor(taskDTO.getColor());
         task.setStatus(taskDTO.getStatus());
+        task.setSystemTask(taskDTO.isSystemTask());
+        task.setExternalId(taskDTO.getExternalId());
         return task;
     }
 
@@ -81,6 +106,13 @@ public class TaskServiceImpl implements TaskService {
         if (Optional.ofNullable((taskDTO.getStatus())).isPresent()) {
             task.setStatus(taskDTO.getStatus());
         }
+
+        task.setSystemTask(taskDTO.isSystemTask());
+
+        if (Optional.ofNullable((taskDTO.getExternalId())).isPresent()) {
+            task.setExternalId(taskDTO.getExternalId());
+        }
+
         return task;
     }
 }

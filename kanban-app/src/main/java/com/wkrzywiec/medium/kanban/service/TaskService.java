@@ -19,4 +19,9 @@ public interface TaskService {
     Task updateTask(Task oldTask, TaskDTO newTaskDTO);
 
     void deleteTask(Task task);
+
+    // НОВЫЕ МЕТОДЫ:
+    Task promoteToSystemTask(Long id, String externalId);
+
+    Task saveSystemTask(String title, String description, String externalId);
 }

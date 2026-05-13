@@ -27,4 +27,19 @@ export class TaskService {
   getTaskById(id: string): Observable<Task> {
     return this.http.get<Task>(this.kanbanAppUrl + '/tasks/' + id);
   }
+
+  // НОВЫЙ МЕТОД: Отправить задачу во внешнюю систему (сделать системной)
+  promoteToSystemTask(id: number): Observable<Task> {
+    return this.http.post<Task>(
+      this.kanbanAppUrl + '/tasks/' + id + '/promote-to-system',
+      {}
+    );
+  }
+
+  // НОВЫЙ МЕТОД: Загрузить системные задачи из внешней системы
+  loadSystemTasks(limit: number = 3): Observable<string> {
+    return this.http.get<string>(
+      this.kanbanAppUrl + '/tasks/load-system-tasks?limit=' + limit
+    );
+  }
 }

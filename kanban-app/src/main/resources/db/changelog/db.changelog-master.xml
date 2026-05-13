@@ -42,5 +42,14 @@
         <comment>Add status column to task table</comment>
     </changeSet>
 
+    <changeSet id="5" author="Wojtek">
+        <sqlFile path="05_task_system.sql"
+                 relativeToChangelogFile="true"
+                 splitStatements="true"
+                 stripComments="true"/>
+
+        <comment>AUpdate task table. Add new columns for system tasks.</comment>
+    </changeSet>
+
 </databaseChangeLog>
 
