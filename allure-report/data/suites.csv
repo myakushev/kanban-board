@@ -1,2 +1,2 @@
 "Status","Start Time","Stop Time","Duration in ms","Parent Suite","Suite","Sub Suite","Test Class","Test Method","Name","Description"
-"passed","Tue May 12 14:34:06 UTC 2026","Tue May 12 14:34:10 UTC 2026","4408","Surefire suite","Surefire test","com.myakushev.api.CreateKanbanAndTasksTest","com.myakushev.api.CreateKanbanAndTasksTest","createSimpleKanban","createSimpleKanban","Basic first test to explore"
+"passed","Wed May 13 13:24:15 UTC 2026","Wed May 13 13:24:18 UTC 2026","3195","Surefire suite","Surefire test","com.myakushev.api.CreateKanbanAndTasksTest","com.myakushev.api.CreateKanbanAndTasksTest","createSimpleKanban","createSimpleKanban","Basic first test to explore"
