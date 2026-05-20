@@ -1,1 +1,1 @@
-[{"uid":"e808c61e522b6624","name":"createSimpleKanban","time":{"start":1778678655549,"stop":1778678658744,"duration":3195},"status":"passed","severity":"normal"}]
+[{"uid":"cb45f29f385b9acc","name":"createKanban","time":{"start":1779319342760,"stop":1779319358185,"duration":15425},"status":"failed","severity":"normal"},{"uid":"4486057cb28567a3","name":"createSimpleKanban","time":{"start":1779319358232,"stop":1779319360459,"duration":2227},"status":"passed","severity":"normal"}]
