@@ -1,4 +1,6 @@
 package com.myakushev.ui;
 
-public class BaseUITest {
+import com.myakushev.BaseTest;
+
+public class BaseUITest extends BaseTest {
 }
