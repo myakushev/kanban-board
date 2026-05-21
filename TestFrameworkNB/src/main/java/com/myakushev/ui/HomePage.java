@@ -7,8 +7,7 @@ import com.codeborne.selenide.SelenideElement;
 import static com.codeborne.selenide.Condition.*;
 import static com.codeborne.selenide.Selectors.*;
 import static com.codeborne.selenide.Selectors.byXpath;
-import static com.codeborne.selenide.Selenide.$;
-import static com.codeborne.selenide.Selenide.element;
+import static com.codeborne.selenide.Selenide.*;
 
 public class HomePage extends Page {
     private SelenideElement createKanbanButton = element(withText("Create Kanban"));
@@ -25,7 +24,7 @@ public class HomePage extends Page {
     private SelenideElement mainCard = $(byXpath(".//div[@class='main-card']"));
 
     private ElementsCollection kanbanItems() {
-        return mainCard.$$x(".//a[contains(@class,'mat-list-item')]");
+        return $$x("//div[contains(@class,'main-card')]//a[contains(@class,'mat-list-item')]");
     }
 
     public HomePage open() {
