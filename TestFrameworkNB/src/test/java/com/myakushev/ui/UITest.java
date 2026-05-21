@@ -12,7 +12,7 @@ public class UITest extends BaseUITest {
         homePage.saveKanban();
         var kanbanPage = homePage.openKanbanBoardWithName(kanbanTitle);
         for (int i = 0; i < 3; i++) {
-            kanbanPage.createNewTask(String.format("%d First Task", i), "BLUEE", String.format("%d Task first description", i));
+            kanbanPage.createNewTask(String.format("%d First Task", i), "BLUE", String.format("%d Task first description", i));
         }
     }
 }
