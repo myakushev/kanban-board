@@ -6,7 +6,6 @@ import com.codeborne.selenide.SelenideElement;
 
 import static com.codeborne.selenide.Condition.*;
 import static com.codeborne.selenide.Selectors.*;
-import static com.codeborne.selenide.Selectors.byXpath;
 import static com.codeborne.selenide.Selenide.*;
 
 public class HomePage extends Page {
@@ -44,6 +43,8 @@ public class HomePage extends Page {
 
     public void saveKanban() {
         saveButton.click();
+        popup.shouldBe(hidden);
+        refreshPage();
     }
 
     public void closeKanban() {
@@ -53,6 +54,7 @@ public class HomePage extends Page {
     public KanbanPage openKanbanBoardWitName(String kanbanName) {
         kanbanItems()
                 .findBy(text(kanbanName))
+                .shouldBe(visible)
                 .shouldBe(clickable)
                 .click();
         KanbanPage kanbanPage = new KanbanPage();
