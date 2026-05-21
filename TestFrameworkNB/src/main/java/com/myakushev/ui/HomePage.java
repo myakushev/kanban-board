@@ -44,14 +44,14 @@ public class HomePage extends Page {
     public void saveKanban() {
         saveButton.click();
         popup.shouldBe(hidden);
-        refreshPage();
+        refreshPage(); // workaround to avoid bug in UI, when first kanban is not appeared after creation
     }
 
     public void closeKanban() {
         closeButton.click();
     }
 
-    public KanbanPage openKanbanBoardWitName(String kanbanName) {
+    public KanbanPage openKanbanBoardWithName(String kanbanName) {
         kanbanItems()
                 .findBy(text(kanbanName))
                 .shouldBe(visible)

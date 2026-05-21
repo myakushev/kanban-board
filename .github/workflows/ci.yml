@@ -39,7 +39,7 @@ jobs:
         working-directory: ./TestFrameworkNB
         run: mvn clean install -DskipTests
 
-      - name: Run RestAssured tests using TestNG
+      - name: Run RestAssured and UI tests using TestNG
         working-directory: ./TestFrameworkNB
         run: mvn test
         env:

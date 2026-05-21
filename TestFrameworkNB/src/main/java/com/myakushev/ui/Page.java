@@ -9,7 +9,7 @@ public abstract class Page {
         Configuration.browser = "chrome";
         Configuration.browserSize = "1920x1280";
         Configuration.headless = Boolean.parseBoolean(Config.getProperty("headless"));
-        Configuration.timeout = 9000;
+//        Configuration.timeout = 9000;
     }
 
     public void refreshPage() {
