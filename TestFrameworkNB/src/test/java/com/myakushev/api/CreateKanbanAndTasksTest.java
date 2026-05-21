@@ -14,6 +14,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.*;
 
 @Slf4j
+@Test(groups = "api")
 public class CreateKanbanAndTasksTest extends BaseApiTest {
 
     @Test

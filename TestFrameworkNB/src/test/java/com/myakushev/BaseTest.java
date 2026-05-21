@@ -8,7 +8,11 @@ import com.myakushev.api.utils.DBCleaner;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.SoftAssertions;
 import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeGroups;
 import org.testng.annotations.BeforeMethod;
+
+import java.sql.SQLException;
 
 @Slf4j
 public class BaseTest {
@@ -25,18 +29,30 @@ public class BaseTest {
         this.checkedRequests = new CheckedRequests(spec.noAuthSpec());
     }
 
-    @BeforeMethod
-    public void beforeTest() {
-        softy = new SoftAssertions();
-
-        try{
+    public void cleanDB() {
+        try {
             DBCleaner.cleanKanbanSchema(Specifications.getSpec().getDataSource());
-        } catch (Exception e) {
+        } catch (SQLException e) {
             log.error("e: ", e);
         }
     }
 
+    @BeforeMethod(onlyForGroups = "api")
+    public void cleanDBForApi() {
+        cleanDB();
+    }
+
+    @BeforeGroups(groups = "ui")
+    public void cleanDBForUI() {
+        cleanDB();
+    }
+
+    @BeforeMethod
+    public void beforeTest() {
+        softy = new SoftAssertions();
+    }
+
     @AfterMethod
     public void afterTest() {
-        softy.assertAll();;
+        softy.assertAll();
     }}
