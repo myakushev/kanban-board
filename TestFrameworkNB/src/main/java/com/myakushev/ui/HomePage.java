@@ -4,8 +4,7 @@ import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.Selenide;
 import com.codeborne.selenide.SelenideElement;
 
-import static com.codeborne.selenide.Condition.text;
-import static com.codeborne.selenide.Condition.visible;
+import static com.codeborne.selenide.Condition.*;
 import static com.codeborne.selenide.Selectors.*;
 import static com.codeborne.selenide.Selectors.byXpath;
 import static com.codeborne.selenide.Selenide.$;
@@ -20,7 +19,7 @@ public class HomePage extends Page {
     private SelenideElement closeButton = popup.$x(".//button[text()='Close']");
 
     private SelenideElement mainCard = $(byXpath(".//div[@class='main-card']"));
-    private ElementsCollection kanbanItem = mainCard.$$("a[class=mat-list-item]");
+    private ElementsCollection kanbanItem = mainCard.$$x(".//a[@class='mat-list-item']");
 
 
     public HomePage open() {
@@ -49,6 +48,7 @@ public class HomePage extends Page {
     public KanbanPage openKanbanBoardWitName(String kanbanName) {
         kanbanItem
                 .findBy(text(kanbanName))
+                .shouldBe(clickable)
                 .click();
         KanbanPage kanbanPage = new KanbanPage();
         kanbanPage.checkKanbanUrl();

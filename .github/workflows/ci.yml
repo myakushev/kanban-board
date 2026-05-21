@@ -42,6 +42,8 @@ jobs:
       - name: Run RestAssured tests using TestNG
         working-directory: ./TestFrameworkNB
         run: mvn test
+        env:
+          HEADLESS: "true"
 
       - name: Generate Allure Report
         working-directory: ./TestFrameworkNB

@@ -16,6 +16,12 @@ public class Config {
 
     public static String getProperty(String key) {
         getConfig();
+
+        // For CI/CD - reading from env properties, not config
+        String envKey = key.toUpperCase().replace(".", "_");
+        String envProp = System.getenv(envKey);
+        if (envProp != null) return envProp;
+
         return properties.getProperty(key);
     }
 
@@ -37,5 +43,4 @@ public class Config {
             throw new RuntimeException(e);
         }
     }
-
 }
