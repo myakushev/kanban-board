@@ -1,3 +1,5 @@
 "Status","Start Time","Stop Time","Duration in ms","Parent Suite","Suite","Sub Suite","Test Class","Test Method","Name","Description"
-"passed","Thu May 21 12:52:34 UTC 2026","Thu May 21 12:52:36 UTC 2026","2426","Surefire suite","Surefire test","com.myakushev.api.CreateKanbanAndTasksTest","com.myakushev.api.CreateKanbanAndTasksTest","createSimpleKanban","createSimpleKanban","Basic first test to explore"
-"passed","Thu May 21 12:52:17 UTC 2026","Thu May 21 12:52:34 UTC 2026","16429","Surefire suite","Surefire test","com.myakushev.ui.UITest","com.myakushev.ui.UITest","createKanban","createKanban",""
+"passed","Thu May 21 15:14:12 UTC 2026","Thu May 21 15:14:28 UTC 2026","15979","Surefire suite","Surefire test","com.myakushev.ui.UITest","com.myakushev.ui.UITest","createKanban","createKanban",""
+"passed","Thu May 21 15:14:28 UTC 2026","Thu May 21 15:14:33 UTC 2026","4884","Surefire suite","Surefire test","com.myakushev.ui.UITest","com.myakushev.ui.UITest","createKanban","createKanban",""
+"passed","Thu May 21 15:14:38 UTC 2026","Thu May 21 15:14:40 UTC 2026","2401","Surefire suite","Surefire test","com.myakushev.api.CreateKanbanAndTasksTest","com.myakushev.api.CreateKanbanAndTasksTest","createSimpleKanban","createSimpleKanban","Basic first test to explore"
+"passed","Thu May 21 15:14:33 UTC 2026","Thu May 21 15:14:38 UTC 2026","5028","Surefire suite","Surefire test","com.myakushev.ui.UITest","com.myakushev.ui.UITest","createKanban","createKanban",""
