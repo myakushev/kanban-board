@@ -21,7 +21,7 @@ public class HomePage extends Page {
 //    private ElementsCollection kanbanItem = mainCard.$$x(".//a[@class='mat-list-item']");
 
 
-    private SelenideElement mainCard = $(byXpath(".//div[@class='main-card']"));
+//    private SelenideElement mainCard = $(byXpath(".//div[@class='main-card']"));
 
     private ElementsCollection kanbanItems() {
         return $$x("//div[contains(@class,'main-card')]//a[contains(@class,'mat-list-item')]");
