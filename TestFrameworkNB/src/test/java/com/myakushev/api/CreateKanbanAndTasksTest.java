@@ -11,6 +11,7 @@ import org.testng.annotations.Test;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.assertj.core.api.Assertions.*;
 
 @Slf4j
@@ -90,6 +91,62 @@ public class CreateKanbanAndTasksTest extends BaseApiTest {
                         .build());
 
         System.out.println(tasksAddedToKanban);
+    }
+
+    @Test
+    @Severity(SeverityLevel.CRITICAL)
+    @Description("Test with wiremock")
+    @Owner("Mikhail Yakushev")
+    public void wiremockTest() {
+
+        stubFor(get(urlPathEqualTo("/external/system-tasks"))
+//                .withHeader("Content-Type", containing("application/json"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody("[{" +
+                                "\"id\": \"111\"," +
+                                "\"title\": \"title sys\"," +
+                                "\"description\": \"description sys\"," +
+                                "\"priority\": \"HIGH\"" +
+                                "}]")));
+
+
+        var testData = Allure.step("Create test data", () -> testDataStorage.addTestData());
+
+        var checkedKanbanRequester = Allure.step("Initialize API requester", () ->
+                new CheckedKanban(Specifications.getSpec().noAuthSpec()));
+
+        Kanban checkedKanban = Allure.step("Create kanban", () -> checkedKanbanRequester
+                .create(testData.getKanbanRequest()));
+
+        Kanban checkedKanbanUpdated = Allure.step("", () -> {
+            checkedKanban.setTitle("New Kanban Title");
+            return checkedKanbanRequester
+                    .update(checkedKanban.getId(), checkedKanban);
+        });
+
+        Kanban tasksAddedToKanban = Allure.step("Add new task to kanban board", () -> checkedKanbanRequester
+                .addNewTaskToKanban(checkedKanbanUpdated.getId(), testData.getTaskRequest()));
+
+        log.info(tasksAddedToKanban.toString());
+
+        assertThat(tasksAddedToKanban)
+                .usingRecursiveComparison()
+//                .ignoringFieldsMatchingRegexes(".*id")
+                .ignoringFields("id", "tasks.id")
+                .isEqualTo(Kanban.builder()
+                        .title(checkedKanban.getTitle())
+                        .description(null)
+                        .tasks(List.of(Task.builder()
+                                .title(testData.getTaskRequest().getTitle())
+                                .description(testData.getTaskRequest().getDescription())
+                                .color(testData.getTaskRequest().getColor())
+                                .status(testData.getTaskRequest().getStatus())
+                                .build()))
+                        .build());
+
+        log.info("DEBUG");
     }
 
 

@@ -26,11 +26,14 @@ services:
       - SPRING_DATASOURCE_USERNAME=kanban
       - SPRING_DATASOURCE_PASSWORD=kanban
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - EXTERNAL_SERVICE_URL=http://wiremock:9090
     ports:
       - 8080:8080
     depends_on:
       kanban-postgres:
-        condition: service_healthy
+          condition: service_healthy
+      wiremock:
+        condition: service_started
 
   kanban-ui:
     build: ./kanban-ui
@@ -39,6 +42,12 @@ services:
       - 4200:80
     depends_on:
       - kanban-app
+
+  wiremock:
+    image: wiremock/wiremock:3.13.1
+    ports:
+      - "8081:9090"
+    command: --port 9090 --verbose
 
 volumes:
   kanban-data:

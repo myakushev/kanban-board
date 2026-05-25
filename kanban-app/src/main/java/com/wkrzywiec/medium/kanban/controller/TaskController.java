@@ -11,12 +11,14 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -27,6 +29,8 @@ import java.util.Optional;
 @CrossOrigin(origins = "http://localhost:4200")
 @Tag(name = "Task Management", description = "Endpoints for managing tasks")
 public class TaskController {
+
+    private static final Logger log = LoggerFactory.getLogger(TaskController.class);
 
     private final TaskService taskService;
     private final RestTemplate restTemplate = new RestTemplate();
@@ -47,6 +51,7 @@ public class TaskController {
                     taskService.getAllTasks(),
                     HttpStatus.OK);
         } catch (Exception e) {
+            log.error("Error fetching all tasks", e);
             return errorResponse();
         }
     }
@@ -70,6 +75,7 @@ public class TaskController {
                 return noTaskFoundResponse(id);
             }
         } catch (Exception e) {
+            log.error("Error fetching task with id: {}", id, e);
             return errorResponse();
         }
     }
@@ -93,6 +99,7 @@ public class TaskController {
                 return new ResponseEntity<>("No task found with a title: " + title, HttpStatus.NOT_FOUND);
             }
         } catch (Exception e) {
+            log.error("Error fetching task by title: {}", title, e);
             return errorResponse();
         }
     }
@@ -110,6 +117,7 @@ public class TaskController {
                     taskService.saveNewTask(taskDTO),
                     HttpStatus.CREATED);
         } catch (Exception e) {
+            log.error("Error creating task", e);
             return errorResponse();
         }
     }
@@ -133,6 +141,7 @@ public class TaskController {
                 return noTaskFoundResponse(id);
             }
         } catch (Exception e) {
+            log.error("Error updating task with id: {}", id, e);
             return errorResponse();
         }
     }
@@ -155,6 +164,7 @@ public class TaskController {
                 return noTaskFoundResponse(id);
             }
         } catch (Exception e) {
+            log.error("Error deleting task with id: {}", id, e);
             return errorResponse();
         }
     }
@@ -188,20 +198,28 @@ public class TaskController {
             request.setStatus(task.getStatus() != null ? task.getStatus().toString() : "TODO");
 
             String wiremockUrl = externalServiceUrl + "/external/send-task";
+
+            log.info("Promoting task id={} to external system. URL: {}", id, wiremockUrl);
+
             ExternalTaskResponse response = restTemplate.postForObject(wiremockUrl, request, ExternalTaskResponse.class);
 
             if (response == null || response.getExternalId() == null) {
+                log.warn("External service returned invalid response for task id={}", id);
                 return new ResponseEntity<>("External service returned invalid response", HttpStatus.INTERNAL_SERVER_ERROR);
             }
+
+            log.info("External system accepted task id={}, assigned externalId={}", id, response.getExternalId());
 
             Task updatedTask = taskService.promoteToSystemTask(id, response.getExternalId());
 
             return new ResponseEntity<>(updatedTask, HttpStatus.OK);
 
         } catch (RestClientException e) {
+            log.error("RestClientException while promoting task id={}: {}", id, e.getMessage());
             return new ResponseEntity<>("Failed to send task to external system: " + e.getMessage(),
                     HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (Exception e) {
+            log.error("Unexpected error while promoting task id={}", id, e);
             return errorResponse();
         }
     }
@@ -214,28 +232,48 @@ public class TaskController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     public ResponseEntity<?> loadSystemTasks(@RequestParam(defaultValue = "3") int limit){
+
+        log.info("Received request to load system tasks with limit: {}", limit);
+
         try {
             String wiremockUrl = externalServiceUrl + "/external/system-tasks?limit=" + limit;
+
+            log.debug("Calling external service URL: {}", wiremockUrl);
+
             ExternalSystemTask[] systemTasks = restTemplate.getForObject(wiremockUrl, ExternalSystemTask[].class);
 
             if (systemTasks == null) {
+                log.warn("External service returned NULL response for URL: {}", wiremockUrl);
                 return new ResponseEntity<>("No system tasks received from external service", HttpStatus.OK);
             }
 
+            log.info("Successfully fetched {} system tasks from external service", systemTasks.length);
+
+            int savedCount = 0;
             for (ExternalSystemTask sysTask : systemTasks) {
-                taskService.saveSystemTask(
-                        sysTask.getTitle(),
-                        sysTask.getDescription(),
-                        String.valueOf(sysTask.getId())
-                );
+                try {
+                    taskService.saveSystemTask(
+                            sysTask.getTitle(),
+                            sysTask.getDescription(),
+                            String.valueOf(sysTask.getId())
+                    );
+                    savedCount++;
+                    log.debug("Saved system task: {} (ID: {})", sysTask.getTitle(), sysTask.getId());
+                } catch (Exception ex) {
+                    log.error("Failed to save system task with external ID: {}. Error: {}", sysTask.getId(), ex.getMessage());
+                }
             }
 
-            return new ResponseEntity<>("Successfully loaded " + systemTasks.length + " system tasks", HttpStatus.OK);
+            log.info("Finished loading system tasks. Total fetched: {}, Successfully saved: {}", systemTasks.length, savedCount);
+            return new ResponseEntity<>("Successfully loaded " + savedCount + " system tasks", HttpStatus.OK);
 
         } catch (RestClientException e) {
+            log.error("RestClientException during loading system tasks. URL: {}. Error: {}",
+                    externalServiceUrl + "/external/system-tasks", e.getMessage());
             return new ResponseEntity<>("Failed to load system tasks: " + e.getMessage(),
                     HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (Exception e) {
+            log.error("Unexpected error during loading system tasks", e);
             return errorResponse();
         }
     }
