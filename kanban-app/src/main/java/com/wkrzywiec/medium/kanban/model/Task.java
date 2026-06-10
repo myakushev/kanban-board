@@ -40,6 +40,10 @@ public class Task {
     @Schema(description = "Flag indicating if this is a system task", example = "false")
     private boolean isSystemTask = false;
 
+    @Column(name = "kanban_id")
+    @Schema(description = "Id of related kanban board", example = "1")
+    private Long kanbanId;
+
     @Column(name = "external_id")
     @Schema(description = "External system identifier if task is promoted to system task", example = "ext_12345")
     private String externalId;

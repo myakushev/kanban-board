@@ -66,6 +66,12 @@ public class KanbanServiceImpl implements KanbanService {
         return kanbanRepository.save(kanban);
     }
 
+    @Override
+    @Transactional
+    public boolean doesKanbanExist(Long kanbanId) {
+        return kanbanRepository.existsById(kanbanId);
+    }
+
     private Kanban convertDTOToKanban(KanbanDTO kanbanDTO){
         Kanban kanban = new Kanban();
         kanban.setTitle(kanbanDTO.getTitle());

@@ -36,10 +36,11 @@ export class TaskService {
     );
   }
 
-  // НОВЫЙ МЕТОД: Загрузить системные задачи из внешней системы
-  loadSystemTasks(limit: number = 3): Observable<string> {
+  // ИСПРАВЛЕННЫЙ МЕТОД: Загрузить системные задачи из внешней системы для конкретной канбан-доски
+  loadSystemTasks(kanbanId: number, limit: number = 3): Observable<string> {
     return this.http.get<string>(
-      this.kanbanAppUrl + '/tasks/load-system-tasks?limit=' + limit
+      this.kanbanAppUrl + '/tasks/load-system-tasks/' + kanbanId + '?limit=' + limit,
+      { responseType: 'text' as 'json' }
     );
   }
 }

@@ -20,8 +20,7 @@ public interface TaskService {
 
     void deleteTask(Task task);
 
-    // НОВЫЕ МЕТОДЫ:
     Task promoteToSystemTask(Long id, String externalId);
 
-    Task saveSystemTask(String title, String description, String externalId);
+    Task saveSystemTask(String title, String description, String externalId, Long kanbanId);
 }

@@ -117,14 +117,15 @@ export class KanbanComponent implements OnInit {
 
   loadSystemTasks(): void {
     this.isLoadingSystemTasks = true;
-    this.taskService.loadSystemTasks(3).subscribe({
+    // Передаём kanban.id в метод сервиса
+    this.taskService.loadSystemTasks(this.kanban.id, 3).subscribe({
       next: (message) => {
         this.isLoadingSystemTasks = false;
         alert(message);
         this.getKanban();
       },
-      error: (error) => {
-        this.isLoadingSystemTasks = false;
+    error: (error) => {
+      this.isLoadingSystemTasks = false;
         console.error('Error loading system tasks:', error);
         alert('Failed to load system tasks');
       }

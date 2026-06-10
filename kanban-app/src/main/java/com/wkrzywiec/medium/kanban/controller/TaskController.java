@@ -2,6 +2,7 @@ package com.wkrzywiec.medium.kanban.controller;
 
 import com.wkrzywiec.medium.kanban.model.Task;
 import com.wkrzywiec.medium.kanban.model.TaskDTO;
+import com.wkrzywiec.medium.kanban.service.KanbanService;
 import com.wkrzywiec.medium.kanban.service.TaskService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -33,6 +34,7 @@ public class TaskController {
     private static final Logger log = LoggerFactory.getLogger(TaskController.class);
 
     private final TaskService taskService;
+    private final KanbanService kanbanService;
     private final RestTemplate restTemplate = new RestTemplate();
 
     @Value("${external.service.url:http://localhost:9999}")
@@ -224,20 +226,28 @@ public class TaskController {
         }
     }
 
-    @GetMapping("/load-system-tasks")
-    @Operation(summary = "Load system tasks", description = "Loads system tasks from external service and adds them to the board")
+    @GetMapping("/load-system-tasks/{kanbanId}")
+    @Operation(summary = "Load system tasks", description = "Loads system tasks from external service and adds them to the specified kanban board")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "System tasks successfully loaded",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = String.class))),
+            @ApiResponse(responseCode = "404", description = "Kanban board not found"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    public ResponseEntity<?> loadSystemTasks(@RequestParam(defaultValue = "3") int limit){
+    public ResponseEntity<?> loadSystemTasks(
+            @PathVariable Long kanbanId,
+            @RequestParam(defaultValue = "3") int limit) {
 
-        log.info("Received request to load system tasks with limit: {}", limit);
+        log.info("Received request to load system tasks for kanbanId: {} with limit: {}", kanbanId, limit);
 
         try {
-            String wiremockUrl = externalServiceUrl + "/external/system-tasks?limit=" + limit;
+            // Первым делом проверим, существует ли kanban доска с таким ID
+            if (!kanbanService.doesKanbanExist(kanbanId)) {
+                log.warn("Kanban board with id {} not found", kanbanId);
+                return new ResponseEntity<>("Kanban board not found with id: " + kanbanId, HttpStatus.NOT_FOUND);
+            }
 
+            String wiremockUrl = externalServiceUrl + "/external/system-tasks?limit=" + limit;
             log.debug("Calling external service URL: {}", wiremockUrl);
 
             ExternalSystemTask[] systemTasks = restTemplate.getForObject(wiremockUrl, ExternalSystemTask[].class);
@@ -252,20 +262,23 @@ public class TaskController {
             int savedCount = 0;
             for (ExternalSystemTask sysTask : systemTasks) {
                 try {
+                    // Передаём kanbanId в метод сохранения
                     taskService.saveSystemTask(
                             sysTask.getTitle(),
                             sysTask.getDescription(),
-                            String.valueOf(sysTask.getId())
+                            String.valueOf(sysTask.getId()),
+                            kanbanId  // <-- добавили параметр kanbanId
                     );
                     savedCount++;
-                    log.debug("Saved system task: {} (ID: {})", sysTask.getTitle(), sysTask.getId());
+                    log.debug("Saved system task: {} (ID: {}) to kanban: {}", sysTask.getTitle(), sysTask.getId(), kanbanId);
                 } catch (Exception ex) {
-                    log.error("Failed to save system task with external ID: {}. Error: {}", sysTask.getId(), ex.getMessage());
+                    log.error("Failed to save system task with external ID: {} to kanban: {}. Error: {}",
+                            sysTask.getId(), kanbanId, ex.getMessage());
                 }
             }
 
             log.info("Finished loading system tasks. Total fetched: {}, Successfully saved: {}", systemTasks.length, savedCount);
-            return new ResponseEntity<>("Successfully loaded " + savedCount + " system tasks", HttpStatus.OK);
+            return new ResponseEntity<>("Successfully loaded " + savedCount + " system tasks to kanban " + kanbanId, HttpStatus.OK);
 
         } catch (RestClientException e) {
             log.error("RestClientException during loading system tasks. URL: {}. Error: {}",

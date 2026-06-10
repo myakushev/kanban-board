@@ -68,13 +68,14 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     @Transactional
-    public Task saveSystemTask(String title, String description, String externalId) {
+    public Task saveSystemTask(String title, String description, String externalId, Long kanbanId) {
         Task task = new Task();
         task.setTitle(title);
         task.setDescription(description);
         task.setColor("#FFFFFF");
         task.setStatus(TaskStatus.TODO);
         task.setSystemTask(true);
+        task.setKanbanId(kanbanId);
         task.setExternalId(externalId);
         return taskRepository.save(task);
     }
